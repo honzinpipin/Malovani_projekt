@@ -14,6 +14,11 @@ public class LineRasterizerTrivial implements rasterizers.Rasterizer {
 
     @Override
     public void rasterize(Line line) {
+
+        if (line.getPoint1() == null || line.getPoint2() == null) {
+            return; // ochrana proti chybě
+        }
+
         int x1 = line.getPoint1().getX();
         int y1 = line.getPoint1().getY();
         int x2 = line.getPoint2().getX();
