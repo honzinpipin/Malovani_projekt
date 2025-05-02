@@ -33,6 +33,8 @@ public class App {
     private boolean shiftMode = false;
     private boolean squareMode = false;
     private boolean polygonMode = false;
+    private boolean rectangleMode = false;
+    private boolean circleMode = false;
 
     public static void main(String[] args) {
         SwingUtilities.invokeLater(() -> new App(800, 600).start());
@@ -162,7 +164,14 @@ public class App {
                         canvas.addStraightLine(line);
                     } else if (squareMode) {
                         canvas.addSquareLine(line);
-                    } else {
+                    }
+                    else if(rectangleMode){
+                        canvas.addRectangleLine(line);
+                    }
+                    else if(circleMode){
+                        canvas.addCircleLine(line);
+                    }
+                    else {
                         canvas.addLine(line);
                     }
 
@@ -179,6 +188,7 @@ public class App {
                 else if(bucketMode) {
 
                 }
+
                 else{
 
                 Point point2 = new Point(e.getX(), e.getY());
@@ -197,6 +207,12 @@ public class App {
                 }
                 else if(squareMode) {
                     rasterizer.rasterizeSquareLine(line);
+                }
+                else if(rectangleMode){
+                    rasterizer.rasterizeRectangleLine(line);
+                }
+                else if(circleMode){
+                    rasterizer.rasterizeCircleLine(line);
                 }
                 else {
                     rasterizer.rasterizeLine(line);
@@ -229,6 +245,12 @@ public class App {
                 else if(e.getKeyCode() == KeyEvent.VK_B){
                     bucketMode = true;
                 }
+                else if(e.getKeyCode() == KeyEvent.VK_R){
+                    rectangleMode = true;
+                }
+                else if(e.getKeyCode() == KeyEvent.VK_K){
+                    circleMode = true;
+                }
             }
 
             @Override
@@ -247,6 +269,12 @@ public class App {
                 }
                 else if(e.getKeyCode() == KeyEvent.VK_B){
                     bucketMode = false;
+                }
+                else if(e.getKeyCode() == KeyEvent.VK_R){
+                    rectangleMode = false;
+                }
+                else if(e.getKeyCode() == KeyEvent.VK_K){
+                    circleMode = false;
                 }
             }
         };

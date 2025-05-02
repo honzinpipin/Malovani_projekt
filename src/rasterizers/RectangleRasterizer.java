@@ -7,10 +7,10 @@ import rasters.Raster;
 import java.awt.*;
 import java.util.ArrayList;
 
-public class SquareRasterizer implements Rasterizer {
+public class RectangleRasterizer implements Rasterizer {
     private Raster raster;
 
-    public SquareRasterizer(Raster raster) {
+    public RectangleRasterizer(Raster raster) {
         this.raster = raster;
     }
 
@@ -21,23 +21,16 @@ public class SquareRasterizer implements Rasterizer {
         int x2 = diagonalLine.getPoint2().getX();
         int y2 = diagonalLine.getPoint2().getY();
 
-        int side = Math.max(Math.abs(x2 - x1), Math.abs(y2 - y1));
         ArrayList<Line> lines = new ArrayList();
 
-        // Korekce druhého bodu podle směru a délky strany
-        int xSign = (x2 - x1) >= 0 ? 1 : -1;
-        int ySign = (y2 - y1) >= 0 ? 1 : -1;
 
-        int x2Adjusted = x1 + side * xSign;
-        int y2Adjusted = y1 + side * ySign;
-
-        // Spočítej 4 rohové body čtverce
-        Point topLeft = new Point(Math.min(x1, x2Adjusted), Math.min(y1, y2Adjusted));
-        Point bottomRight = new Point(Math.max(x1, x2Adjusted), Math.max(y1, y2Adjusted));
+        // Získáme rohy obdélníku
+        Point topLeft = new Point(Math.min(x1, x2), Math.min(y1, y2));
+        Point bottomRight = new Point(Math.max(x1, x2), Math.max(y1, y2));
         Point topRight = new Point(bottomRight.getX(), topLeft.getY());
         Point bottomLeft = new Point(topLeft.getX(), bottomRight.getY());
 
-        // Horní hrana
+        // Vykreslení horní hrany
         Line topLine = new Line(topLeft, topRight, Color.cyan);
         lines.add(topLine);
 
@@ -45,7 +38,7 @@ public class SquareRasterizer implements Rasterizer {
             raster.setPixel(x, topLeft.getY(), diagonalLine.getColor().getRGB());
         }
 
-        // Spodní hrana
+        // Vykreslení spodní hrany
         Line bottomLine = new Line(bottomRight, bottomLeft, Color.cyan);
         lines.add(bottomLine);
 
@@ -53,7 +46,7 @@ public class SquareRasterizer implements Rasterizer {
             raster.setPixel(x, bottomLeft.getY(), diagonalLine.getColor().getRGB());
         }
 
-        // Levá hrana
+        // Vykreslení levé hrany
         Line leftLine = new Line(bottomLeft, topLeft, Color.cyan);
         lines.add(leftLine);
 
@@ -61,7 +54,7 @@ public class SquareRasterizer implements Rasterizer {
             raster.setPixel(topLeft.getX(), y, diagonalLine.getColor().getRGB());
         }
 
-        // Pravá hrana
+        // Vykreslení pravé hrany
         Line rightLine = new Line(topRight, bottomRight, Color.cyan);
         lines.add(rightLine);
 

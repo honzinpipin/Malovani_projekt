@@ -12,6 +12,8 @@ public class LineCanvasRasterizer {
     private Rasterizer dottedLineRasterizer;
     private Rasterizer straightLineRasterizer;
     private Rasterizer squareLineRasterizer;
+    private Rasterizer rectangleLineRasterizer;
+    private Rasterizer circleLineRasterizer;
 
     public LineCanvasRasterizer(Raster raster) {
         this.raster = raster;
@@ -20,6 +22,8 @@ public class LineCanvasRasterizer {
         dottedLineRasterizer = new DottedLineRasterizer(raster);
         straightLineRasterizer = new StraightLineRasterizer(raster);
         squareLineRasterizer = new SquareRasterizer(raster);
+        rectangleLineRasterizer = new RectangleRasterizer(raster);
+        circleLineRasterizer = new CircleRasterizer(raster);
     }
 
     public void rasterizeCanvas(LineCanvas canvas) {
@@ -27,6 +31,8 @@ public class LineCanvasRasterizer {
         dottedLineRasterizer.rasterizeArray(canvas.getDottedLines());
         straightLineRasterizer.rasterizeArray(canvas.getStraightLines());
         squareLineRasterizer.rasterizeArray(canvas.getSquareLines());
+        rectangleLineRasterizer.rasterizeArray(canvas.getRectangleLines());
+        circleLineRasterizer.rasterizeArray(canvas.getCircleLines());
     }
 
     public void rasterizeLine(Line line) {
@@ -40,4 +46,8 @@ public class LineCanvasRasterizer {
     public void rasterizeStraightLine(Line line) {straightLineRasterizer.rasterize(line);}
 
     public void rasterizeSquareLine(Line line) { squareLineRasterizer.rasterize(line);}
+
+    public void rasterizeRectangleLine(Line line) {rectangleLineRasterizer.rasterize(line);}
+
+    public void rasterizeCircleLine(Line line) {circleLineRasterizer.rasterize(line);}
 }
