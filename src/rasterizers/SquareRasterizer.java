@@ -11,6 +11,10 @@ public class SquareRasterizer implements Rasterizer {
     private Raster raster;
 
     public SquareRasterizer(Raster raster) {
+        //Funguje na stejné bázi jako obdélník, ale má přidanou korekci bodů, aby byl čtverec symetrický
+        //xSign a ySign kontrolují, zda je rozdíl kladný nebo záporný = posun doleva nebo doprava
+
+
         this.raster = raster;
     }
 

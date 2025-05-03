@@ -10,6 +10,10 @@ import java.util.ArrayList;
 public class RectangleRasterizer implements Rasterizer {
     private Raster raster;
 
+    //Vykreslování obdélníků za pomocí diagonál a dopočítávání rohů
+    //Rohy se najdou za pomocí nejmenší/největší souřadnice - např. topLeft bude mít obě souřadnice nejmenší
+    //Poté jen spojíme 2 rohy čárou a přidáme čáru do Listu
+
     public RectangleRasterizer(Raster raster) {
         this.raster = raster;
     }

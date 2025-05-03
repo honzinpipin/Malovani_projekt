@@ -16,6 +16,8 @@ public class LineCanvas {
 
     private ArrayList<Line> circleLines;
 
+    private ArrayList<Line> dashedLines;
+
     public LineCanvas() {
 
         this.lines = new ArrayList<>();
@@ -24,6 +26,7 @@ public class LineCanvas {
         this.squareLines = new ArrayList<>();
         this.rectangleLines = new ArrayList<>();
         this.circleLines = new ArrayList<>();
+        this.dashedLines = new ArrayList<>();
     }
 
     public void addLine(Line line) {
@@ -40,6 +43,8 @@ public class LineCanvas {
 
     public void addCircleLine(Line line) {this.circleLines.add(line);}
 
+    public void addDashedLine(Line line) {this.dashedLines.add(line);}
+
     public void clearLines() {
         this.lines.clear();
     }
@@ -53,6 +58,8 @@ public class LineCanvas {
     public void clearRectangleLines() {this.rectangleLines.clear();}
 
     public void clearCircleLines() {this.circleLines.clear();}
+
+    public void clearDashedLines() {this.dashedLines.clear();}
 
     public ArrayList<Line> getLines() {
         return lines;
@@ -68,6 +75,8 @@ public class LineCanvas {
 
     public ArrayList<Line> getCircleLines() {return circleLines;}
 
+    public ArrayList<Line> getDashedLines() {return dashedLines;}
+
     public void ClearAllLines() {
         this.lines.clear();
         this.dottedLines.clear();
@@ -75,5 +84,6 @@ public class LineCanvas {
         this.squareLines.clear();
         this.rectangleLines.clear();
         this.circleLines.clear();
+        this.dashedLines.clear();
     }
 }

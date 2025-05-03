@@ -34,6 +34,7 @@ public class RasterBufferedImage implements Raster {
         img.setRGB(x, y, color);
     }
 
+
     @Override
     public void clear() {
         Graphics g = img.getGraphics();

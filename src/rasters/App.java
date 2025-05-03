@@ -6,7 +6,7 @@ import models.Point;
 import models.SimplePolygon;
 import rasterizers.BucketRasterizer;
 import rasterizers.LineCanvasRasterizer;
-import rasterizers.Rasterizer;
+import rasterizers.Eraser;
 
 import javax.swing.*;
 import java.awt.*;
@@ -26,10 +26,13 @@ public class App {
     private boolean polygonMode = false;
     private boolean rectangleMode = false;
     private boolean circleMode = false;
+    private boolean eraserMode = false;
+
+    private Point lastEraserPoint = null;
 
     private Color currentColor = Color.cyan;
     private int currentThickness = 1;
-    private String currentLineStyle = "solid"; // solid, dotted, straight
+    private String currentLineStyle = "solid";
 
     public static void main(String[] args) {
         SwingUtilities.invokeLater(() -> new App(800, 600).start());
@@ -67,6 +70,7 @@ public class App {
 
         clear(0xaaaaaa);
     }
+
     public void start() {
         clear(0xaaaaaa);
         panel.repaint();
@@ -79,38 +83,18 @@ public class App {
 
     private void createMouseAdapter() {
         mouseAdapter = new MouseAdapter() {
+            //u polygonu a bucketu se nic nemění, takže zůstavají prázdné
             @Override
             public void mousePressed(MouseEvent e) {
                 if (polygonMode) {
-                    if (polygon == null) polygon = new SimplePolygon();
-                    Point p = new Point(e.getX(), e.getY());
-
-                    if (polygon.isNearFirstPoint(p) && polygon.getPoints().size() > 3) {
-                        polygon.setClosed(true);
-                        Point last = polygon.getLastPoint();
-                        Point first = polygon.getFirstPoint();
-                        Line closing = new Line(last, first, currentColor);
-                        closing.setThickness(currentThickness);
-                        closing.setLineStyle(currentLineStyle);
-                        canvas.addLine(closing);
-                        rasterizer.rasterizeCanvas(canvas);
-                        polygon.clear();
-                        panel.repaint();
-                    } else {
-                        Point last = polygon.getLastPoint();
-                        polygon.addPoint(p);
-                        if (last != null) {
-                            Line line = new Line(last, p, currentColor);
-                            line.setThickness(currentThickness);
-                            line.setLineStyle(currentLineStyle);
-                            canvas.addLine(line);
-                            rasterizer.rasterizeCanvas(canvas);
-                            panel.repaint();
-                        }
-                    }
+                    return;
                 } else if (bucketMode) {
-                    new BucketRasterizer().BucketFill(raster.getImg(), new Point(e.getX(), e.getY()), currentColor);
-                    rasterizer.rasterizeCanvas(canvas);
+                    return;
+                }
+                //pro eraser se vytváří bod lastEraserPoint, aby zajistil plynulost gumy
+                else if (eraserMode) {
+                    lastEraserPoint = new Point(e.getX(), e.getY());
+                    Eraser.erase(raster, lastEraserPoint, currentThickness);
                     panel.repaint();
                 } else {
                     point = new Point(e.getX(), e.getY());
@@ -119,7 +103,29 @@ public class App {
 
             @Override
             public void mouseDragged(MouseEvent e) {
+                //polygon a bucket nepoužívájí mouseDragged
                 if (polygonMode || bucketMode) return;
+
+                if (eraserMode) {
+                    Point current = new Point(e.getX(), e.getY());
+
+                    // Volání erase pro více bodů, pokud se myš hýbe rychle
+                    if (lastEraserPoint != null) {
+                        int dx = current.getX() - lastEraserPoint.getX();
+                        int dy = current.getY() - lastEraserPoint.getY();
+                        int steps = Math.max(Math.abs(dx), Math.abs(dy));
+
+                        for (int i = 0; i <= steps; i++) {
+                            int x = lastEraserPoint.getX() + i * dx / steps;
+                            int y = lastEraserPoint.getY() + i * dy / steps;
+                            Eraser.erase(raster, new Point(x, y), currentThickness);
+                        }
+                    }
+
+                    lastEraserPoint = current;
+                    panel.repaint();
+                    return;
+                }
 
                 Point point2 = new Point(e.getX(), e.getY());
                 Line line = new Line(point, point2, currentColor);
@@ -129,6 +135,8 @@ public class App {
                 raster.clear();
                 rasterizer.rasterizeCanvas(canvas);
 
+
+                //podmínky pro "náhled" čar
                 if (circleMode) {
                     rasterizer.rasterizeCircleLine(line);
                 } else if (squareMode) {
@@ -143,6 +151,9 @@ public class App {
                         case "straight":
                             rasterizer.rasterizeStraightLine(line);
                             break;
+                        case "dashed":
+                            rasterizer.rasterizeDashedLine(line);
+                            break;
                         default:
                             rasterizer.rasterizeLine(line);
                     }
@@ -153,25 +164,34 @@ public class App {
 
             @Override
             public void mouseReleased(MouseEvent e) {
+                //polygon a bucket opět nevyužívájí
                 if (polygonMode || bucketMode) return;
+
+                if (eraserMode) {
+                    lastEraserPoint = null;
+                    return;
+                }
 
                 Point end = new Point(e.getX(), e.getY());
                 Line line = new Line(point, end, currentColor);
                 line.setThickness(currentThickness);
                 line.setLineStyle(currentLineStyle);
 
+
+                //Tady už se celá čára/objekt vykreslí
                 if (squareMode) {
                     canvas.addSquareLine(line);
                 } else if (rectangleMode) {
                     canvas.addRectangleLine(line);
                 } else if (circleMode) {
                     canvas.addCircleLine(line);
-                }
-                else if(currentLineStyle.equals("dotted")){
+                } else if (currentLineStyle.equals("dotted")) {
                     canvas.addDottedLine(line);
-                }
-                else if(currentLineStyle.equals("straight")){
+                } else if (currentLineStyle.equals("straight")) {
                     canvas.addStraightLine(line);
+                }
+                else if(currentLineStyle.equals("dashed")){
+                    canvas.addDashedLine(line);
                 }
                 else {
                     canvas.addLine(line);
@@ -185,6 +205,8 @@ public class App {
 
     private MouseAdapter mouseAdapter;
 
+
+    //Uživatelské rozhraní
     private void addToolbar(JFrame frame) {
         JPanel toolbar = new JPanel(new FlowLayout());
 
@@ -198,14 +220,13 @@ public class App {
         thicknessBox.setSelectedItem(currentThickness);
         thicknessBox.addActionListener(e -> currentThickness = (Integer) thicknessBox.getSelectedItem());
 
-        JComboBox<String> styleBox = new JComboBox<>(new String[]{"solid", "dotted", "straight"});
+        JComboBox<String> styleBox = new JComboBox<>(new String[]{"solid", "dotted", "straight","dashed"});
         styleBox.setSelectedItem(currentLineStyle);
         styleBox.addActionListener(e -> currentLineStyle = (String) styleBox.getSelectedItem());
 
-        JComboBox<String> shapeBox = new JComboBox<>(new String[]{"Line", "Circle", "Square", "Rectangle", "Polygon", "Bucket"});
+        JComboBox<String> shapeBox = new JComboBox<>(new String[]{"Line", "Circle", "Square", "Rectangle", "Polygon", "Bucket", "Eraser"});
         shapeBox.addActionListener(e -> {
-            // Reset all modes
-            bucketMode = circleMode = squareMode = rectangleMode = polygonMode = false;
+            bucketMode = circleMode = squareMode = rectangleMode = polygonMode = eraserMode = false;
 
             switch ((String) shapeBox.getSelectedItem()) {
                 case "Circle":
@@ -222,6 +243,9 @@ public class App {
                     break;
                 case "Bucket":
                     bucketMode = true;
+                    break;
+                case "Eraser":
+                    eraserMode = true;
                     break;
             }
         });

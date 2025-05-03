@@ -7,6 +7,13 @@ public class SimplePolygon {
     private boolean isClosed = false;
     private static final int CLOSING_RADIUS = 10;
 
+
+    //Obsahuje list bodů
+    //kontroluje zda už je polygon zavřený nebo jestli má furt přidávat další body
+    //má nastavenou closing_radius na 10, to znamená, že když uživatel klikne na první bod v rádiusu 10 pixelů, polygon se uzavře
+    //pokud uživatel klikne mimo closing_radius, přidá se další bod
+
+
     public void addPoint(Point p) {
         if (!points.isEmpty() && isNearFirstPoint(p)) {
             isClosed = true;

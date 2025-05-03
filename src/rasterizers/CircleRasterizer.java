@@ -8,6 +8,15 @@ import java.awt.*;
 import java.util.ArrayList;
 
 public class CircleRasterizer implements Rasterizer {
+
+    //Tato třída přijímá Line, ze které se určí střed kruhu a okraj kruhu
+    //Za pomocí proměnných dx a dy se vypočítá vzdálenost okraje od středu a poté se vypočítá poloměr
+    //Vykreslování kruhu začíná na bodě (0, radius) a poté mění hodnoty x a y, aby vykreslil všechny body na okraji
+    //Kontroluje zda se má měnit hodnota x nebo y
+    //plotCirclePoints() vykresluje 8 symetrických bodů na obvodu kruhu a poté využívá symetrii bodů, protože kruh je symetrický ve 8 směrech
+
+
+
     private final Raster raster;
 
     public CircleRasterizer(Raster raster) {

@@ -7,6 +7,9 @@ import java.util.ArrayList;
 
 public class StraightLineRasterizer implements Rasterizer {
 
+    //Upravuje čáru podle stupňů a za pomocí pythagorovy věty
+    //zajišťuje aby byl rozsah úhlu v rozmezí 0 - 360 stupňů a ne v záporných hodnotách
+
     private Raster raster;
 
     public StraightLineRasterizer(Raster raster) {

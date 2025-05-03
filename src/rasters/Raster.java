@@ -2,6 +2,7 @@ package rasters;
 
 import java.awt.*;
 import java.awt.image.BufferedImage;
+import java.awt.Color;
 
 public interface Raster {
 

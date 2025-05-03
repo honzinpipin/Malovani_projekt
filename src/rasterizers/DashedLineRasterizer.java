@@ -5,14 +5,18 @@ import rasters.Raster;
 
 import java.util.ArrayList;
 
-public class DottedLineRasterizer implements Rasterizer {
+public class DashedLineRasterizer implements Rasterizer {
+    //Vstup je Line, ze které jsou následně vytaženy 4 body
+    //kontrola zda se má vykreslovat vertikálně nebo horizontálně
+    //vynechávání pixelů je vytvořeno tak, že když je hodnota x ve forloopu dělitelná 5, zapne se cyklus na 2 kroky,
+    // kde se vynechájí pixely = 2 pixelová mezera / 5 pixelová čára
+    //umožňuje nakreslit tlustou čáru, kde se veme thickness, vydělí se 2 a dokreslí se 1 polovina nahoru a druhá dolu
 
-    //Funguje stejně jako DashedLine, jen tady není žádný cyklus, mezera je nastavená na pevno
-    //Podporuje také tloušťku čáry
+
 
     private Raster raster;
 
-    public DottedLineRasterizer(Raster raster) {
+    public DashedLineRasterizer(Raster raster) {
         this.raster = raster;
     }
 
@@ -41,9 +45,20 @@ public class DottedLineRasterizer implements Rasterizer {
                 x2 = temp;
             }
 
-            for (int x = x1; x <= x2; x += 10) {
-                int y = Math.round(k * x + q);
-                drawThickPixel(x, y, thickness, color);
+            int counterX = 0;
+            for (int x = x1; x <= x2; x ++) {
+                if(x % 5 != 0) {
+                    if(counterX == 0){
+                        int y = Math.round(k * x + q);
+                        drawThickPixel(x, y, thickness, color);
+                    }
+                    else{
+                        counterX--;
+                    }
+                }
+                else{
+                    counterX = 2;
+                }
             }
         } else {
             if (y1 > y2) {
@@ -52,9 +67,20 @@ public class DottedLineRasterizer implements Rasterizer {
                 y2 = temp;
             }
 
-            for (int y = y1; y <= y2; y += 10) {
-                int x = Math.round((y - q) / k);
-                drawThickPixel(x, y, thickness, color);
+            int counterY = 0;
+            for (int y = y1; y <= y2; y ++) {
+                if(y % 5 != 0) {
+                    if(counterY == 0){
+                    int x = Math.round((y - q) / k);
+                    drawThickPixel(x, y, thickness, color);
+                    }
+                    else{
+                        counterY--;
+                    }
+                }
+                else{
+                    counterY = 2;
+                }
             }
         }
     }

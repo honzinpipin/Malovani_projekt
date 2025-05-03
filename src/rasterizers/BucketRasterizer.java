@@ -6,6 +6,10 @@ import models.Point;
 
 public class BucketRasterizer {
 
+    //kybliková výplň na bázi kontrolování sousedů kliknutého pixelu
+    //zkontroluje barvu souseda, zda má původní barvu, pokud ano, přepíše ji a přidá si souseda do zásobníku
+    //funguje do všech 8 směrů
+
     public void BucketFill(BufferedImage image, Point startPoint, Color newColor) {
         int width = image.getWidth();
         int height = image.getHeight();
@@ -26,7 +30,7 @@ public class BucketRasterizer {
             int x = point.getX();
             int y = point.getY();
 
-            //podmínka abych nevyšel z rasteru
+            //kontrola, jestli se pixel nachází v plátně
             if (x < 0 || x >= width || y < 0 || y >= height) continue;
             if (image.getRGB(x, y) != targetRGB) continue;
 
