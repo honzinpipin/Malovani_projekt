@@ -83,12 +83,41 @@ public class App {
 
     private void createMouseAdapter() {
         mouseAdapter = new MouseAdapter() {
-            //u polygonu a bucketu se nic nemění, takže zůstavají prázdné
             @Override
             public void mousePressed(MouseEvent e) {
                 if (polygonMode) {
-                    return;
+                    // Initialize polygon if it doesn't exist
+                    if (polygon == null) {
+                        polygon = new SimplePolygon();
+                        polygon.setColor(currentColor);
+                        polygon.setThickness(currentThickness);
+                        polygon.setLineStyle(currentLineStyle);
+                    }
+
+                    Point clickPoint = new Point(e.getX(), e.getY());
+                    polygon.addPoint(clickPoint);
+
+                    //když se polygon zavře, přidej do canvasu
+                    if (polygon.isClosed()) {
+                        polygon.addToCanvas(canvas);
+
+                        raster.clear();
+                        rasterizer.rasterizeCanvas(canvas);
+
+                        //připrav pro další polygon
+                        polygon = null;
+                    } else {
+                        raster.clear();
+                        rasterizer.rasterizeCanvas(canvas);
+                        polygon.draw(raster, rasterizer);
+                    }
+
+                    panel.repaint();
                 } else if (bucketMode) {
+                    Point clicked = new Point(e.getX(), e.getY());
+                    BucketRasterizer bucket = new BucketRasterizer();
+                    bucket.BucketFill(raster.getBufferedImage(), clicked, currentColor);
+                    panel.repaint();
                     return;
                 }
                 //pro eraser se vytváří bod lastEraserPoint, aby zajistil plynulost gumy
